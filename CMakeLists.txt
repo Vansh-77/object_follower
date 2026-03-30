@@ -28,6 +28,7 @@ ament_package()
 install(
   PROGRAMS 
       scripts/follower.py
+      scripts/person_follower.py
       DESTINATION lib/${PROJECT_NAME})
 install(      
   DIRECTORY urdf launch world

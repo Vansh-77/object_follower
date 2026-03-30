@@ -93,5 +93,41 @@
         </visual>
       </link>
     </model>
+    <actor name="actor_walking">
+      <skin>
+        <filename>https://fuel.gazebosim.org/1.0/Mingfei/models/actor/tip/files/meshes/walk.dae</filename>
+        <scale>1.0</scale>
+      </skin>
+      <animation name="walk">
+        <filename>https://fuel.gazebosim.org/1.0/Mingfei/models/actor/tip/files/meshes/walk.dae</filename>
+        <interpolate_x>true</interpolate_x>
+      </animation>
+      <script>
+        <loop>true</loop>
+
+        <trajectory id="0" type="walk">
+
+          <!-- Start position -->
+          <waypoint>
+            <time>0</time>
+            <pose>5 3 1 0 0 0</pose>
+          </waypoint>
+
+          <!-- Move forward -->
+          <waypoint>
+            <time>5</time>
+            <pose>10 3 1 0 0 0</pose>
+          </waypoint>
+
+          <!-- Turn and move -->
+          <waypoint>
+            <time>20</time>
+            <pose>10 -20 1 0 0 -1.57</pose>
+          </waypoint>
+
+
+        </trajectory>
+      </script>
+    </actor>
   </world>
 </sdf>
