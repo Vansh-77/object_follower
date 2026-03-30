@@ -16,9 +16,11 @@ class PersonFollower(Node):
         self.last_twist = Twist()
         self.prev_error = 0
         self.integral = 0
-        self.kp = 0.01
+        self.kp = 0.003
         self.ki = 0.0001
-        self.kd = 0.01
+        self.kd = 0.0005
+        self.lost_frames = 0
+        self.max_lost_frames = 10
         
 
         self.sub = self.create_subscription(
@@ -40,6 +42,7 @@ class PersonFollower(Node):
         twist = Twist()
         
         if len(result.boxes) > 0:
+            self.lost_frames = 0
             box = result.boxes[0]
             x1 , y1 , x2 , y2  = map(int , box.xyxy[0])
             cv2.rectangle(frame , (x1,y1) , (x2 , y2) , (0,255,0) ,2)
@@ -60,9 +63,15 @@ class PersonFollower(Node):
                     self.kd * (error - self.prev_error)
                 )      
                 self.prev_error = error
+                self.last_twist = twist
         else:
-            twist.linear.x = 0.0
-            twist.angular.z = 1.0  
+            self.lost_frames += 1
+            if self.lost_frames > self.max_lost_frames:
+                twist.linear.x = 0.0
+                twist.angular.z = 1.0 if self.prev_error > 0 else -1.0
+            else :
+                twist = self.last_twist
+                
         self.pub.publish(twist)
         cv2.imshow('object follower' , frame)
         cv2.waitKey(1)
