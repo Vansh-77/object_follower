@@ -38,8 +38,8 @@ class ObjectFollower(Node):
         hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
         # orange cone mask
-        lower = np.array([5, 100, 100])
-        upper = np.array([20, 255, 255])
+        lower = np.array([0, 50, 50])
+        upper = np.array([30, 255, 255])
 
         mask = cv2.inRange(hsv, lower, upper)
 
@@ -51,14 +51,19 @@ class ObjectFollower(Node):
 
             c = max(contours, key=cv2.contourArea)
             x, y, wc, hc = cv2.boundingRect(c)
-
+            cv2.rectangle(frame, (x,y), (x+wc, y+hc), (0,255,0), 2)
+            cv2.circle(frame , (x + wc//2, y+ hc//2), 5, (255,0,0) , -1)   
+        
             cx = x + wc//2
 
             error = (w/2) - cx
             self.integral += error
-            if cv2.contourArea(c) > 20000:
-               twist.linear.x = 0
-               twist.angular.z = 0
+            if cv2.contourArea(c) > 5000:
+               twist.linear.x = 0.0
+               twist.angular.z = 0.0
+               self.pub.publish(twist)
+               self.destroy_node()
+               rclpy.shutdown()
             else:
                 twist.linear.x = 0.6
                 twist.angular.z = (
@@ -66,11 +71,16 @@ class ObjectFollower(Node):
                     self.ki * self.integral + 
                     self.kd * (error -self.prev_error)
                 )
+            print("contour area:", cv2.contourArea(c))
             self.prev_error = error
             self.last_twist = twist
         else:
-            twist = self.last_twist
+            twist.linear.x = 0.0
+            twist.angular.z = 1.0
         self.pub.publish(twist)
+        cv2.imshow('object follower' , frame)
+        cv2.imshow('mask' , mask)
+        cv2.waitKey(1)
 
 
 def main(args=None):
