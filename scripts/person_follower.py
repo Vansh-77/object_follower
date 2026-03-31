@@ -16,11 +16,12 @@ class PersonFollower(Node):
         self.last_twist = Twist()
         self.prev_error = 0
         self.integral = 0
-        self.kp = 0.003
-        self.ki = 0.0001
-        self.kd = 0.0005
+        self.kp = 0.006
+        self.ki = 0.0
+        self.kd = 0.001
         self.lost_frames = 0
         self.max_lost_frames = 10
+        self.prev_xvel = 0
         
 
         self.sub = self.create_subscription(
@@ -53,10 +54,16 @@ class PersonFollower(Node):
             area = (x2 - x1) * (y2 - y1)
 
             if area > 10000:
-                twist.linear.x = 0.0
-                twist.angular.z = 0.0
+                twist.linear.x = (0.7 * self.prev_xvel )
+                twist.angular.z = (
+                    self.kp * error +
+                    self.ki * self.integral +
+                    self.kd * (error - self.prev_error)
+                )      
+                self.prev_error = error
+                self.last_twist = twist
             else:
-                twist.linear.x = 0.6
+                twist.linear.x = (0.7 * self.prev_xvel + 0.3 * 1.0 )  
                 twist.angular.z = (
                     self.kp * error +
                     self.ki * self.integral +
@@ -67,11 +74,11 @@ class PersonFollower(Node):
         else:
             self.lost_frames += 1
             if self.lost_frames > self.max_lost_frames:
-                twist.linear.x = 0.0
+                twist.linear.x = (0.7 * self.prev_xvel )
                 twist.angular.z = 1.0 if self.prev_error > 0 else -1.0
             else :
                 twist = self.last_twist
-                
+        self.prev_xvel = twist.linear.x      
         self.pub.publish(twist)
         cv2.imshow('object follower' , frame)
         cv2.waitKey(1)

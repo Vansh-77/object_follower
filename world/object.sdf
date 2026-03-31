@@ -107,24 +107,58 @@
 
         <trajectory id="0" type="walk">
 
-          <!-- Start position -->
+          <!-- Start -->
           <waypoint>
             <time>0</time>
             <pose>5 3 1 0 0 0</pose>
           </waypoint>
 
-          <!-- Move forward -->
+          <!-- Smooth forward -->
           <waypoint>
-            <time>5</time>
-            <pose>10 3 1 0 0 0</pose>
+            <time>4</time>
+            <pose>8 3 1 0 0 0</pose>
           </waypoint>
 
-          <!-- Turn and move -->
+          <waypoint>
+            <time>8</time>
+            <pose>12 4 1 0 0 0.2</pose>
+          </waypoint>
+
+          <!-- Slight curve -->
+          <waypoint>
+            <time>12</time>
+            <pose>14 7 1 0 0 0.6</pose>
+          </waypoint>
+
+          <!-- Turn gradually -->
+          <waypoint>
+            <time>16</time>
+            <pose>13 10 1 0 0 1.2</pose>
+          </waypoint>
+
+          <!-- Walk back diagonally -->
           <waypoint>
             <time>20</time>
-            <pose>10 -20 1 0 0 -1.57</pose>
+            <pose>9 12 1 0 0 2.0</pose>
           </waypoint>
 
+          <!-- Curve back -->
+          <waypoint>
+            <time>24</time>
+            <pose>6 9 1 0 0 2.8</pose>
+          </waypoint>
+
+          <!-- Return near start -->
+          <waypoint>
+            <time>28</time>
+            <pose>5 5 1 0 0 -2.5</pose>
+          </waypoint>
+
+          <!-- Close loop -->
+          <waypoint>
+            <time>32</time>
+            <pose>5 3 1 0 0 -1.57</pose>
+          </waypoint>
 
         </trajectory>
       </script>
