@@ -433,15 +433,3 @@ This project provides hands-on experience in:
 - [ROS2 Control Framework](https://control.ros.org/)
 
 ---
-
-## About the Developer
-
-**Vansh Bhardwaj**
-
-Passionate roboticist and software engineer focused on autonomous systems, computer vision, and real-time control. This project demonstrates full-stack robotics development from algorithm design through hardware deployment.
-
-📧 **Email**: Vanshbhardwaj733@gmail.com  
-🐙 **GitHub**: [Your GitHub Profile]  
-💼 **LinkedIn**: [Your LinkedIn Profile]  
-
-*Last Updated: April 2026*
