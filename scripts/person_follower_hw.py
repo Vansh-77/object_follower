@@ -40,7 +40,7 @@ last_result = None
 frame_count = 0
 
 # ---------------- Camera ----------------
-cap = cv2.VideoCapture("http://10.210.6.102:4747/video")
+cap = cv2.VideoCapture(0 , cv2.CAP_V4L2)
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, 320)
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 240)
 cap.set(cv2.CAP_PROP_FPS, 30)
