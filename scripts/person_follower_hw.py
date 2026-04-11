@@ -5,7 +5,7 @@ from ultralytics import YOLO
 import time
 
 # ---------------- UDP SETUP ----------------
-ESP_IP = "10.210.6.39"
+ESP_IP = "10.210.6.103"
 PORT = 5005
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
@@ -24,12 +24,12 @@ def send_twist(vx, omega):
 model = YOLO("yolov8n.pt")
 
 # ---------------- PID ----------------
-kp = 0.01
+kp = 0.08
 ki = 0.0
-kd = 0.0
+kd = 0.001
 prev_error = 0
 integral = 0
-max_speed = 10.0
+max_speed = 255.0
 
 # ---------------- State ----------------
 lost_frames = 0
@@ -40,7 +40,7 @@ last_result = None
 frame_count = 0
 
 # ---------------- Camera ----------------
-cap = cv2.VideoCapture(0 , cv2.CAP_V4L2)
+cap = cv2.VideoCapture("http://10.210.6.147:5000/video_feed")
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, 320)
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 240)
 cap.set(cv2.CAP_PROP_FPS, 30)
@@ -82,13 +82,13 @@ while True:
             cy = (y1 + y2) // 2
             cv2.circle(frame, (cx, cy), 5, (255, 0, 0), -1)
 
-            error = (w // 2) - cx
+            error = ((w // 2) - cx)*10
             integral += error
             derivative = error - prev_error
 
-            vx = 0.7 * prev_vx + 0.3 * 10.0
+            vx = 0.7 * prev_vx + 0.3 * max_speed
             omega = kp * error + ki * integral + kd * derivative
-
+            omega = max(-max_speed, min(max_speed, omega))
             cv2.line(frame, (w // 2, h // 2), (cx, cy), (255, 255, 0), 2)
             cv2.putText(frame, f"err: {int(error)}",
                         ((w // 2 + cx) // 2, (h // 2 + cy) // 2),
@@ -101,7 +101,7 @@ while True:
 
     if lost_frames > max_lost_frames:
         vx = 0.7 * prev_vx
-        omega = 5 if prev_error > 0 else -5
+        omega = 100 if prev_error > 0 else -100
     elif lost_frames > 0:
         vx = last_cmd["linear"]
         omega = last_cmd["angular"]
