@@ -3,6 +3,35 @@ import socket
 import json
 from ultralytics import YOLO
 import time
+from flask import Flask, Response
+import threading
+
+# ---------------- FLASK ----------------
+app = Flask(__name__)
+stream_frame = None
+
+def generate():
+    global stream_frame
+    while True:
+        if stream_frame is None:
+            continue
+        _, buffer = cv2.imencode('.jpg', stream_frame)
+        yield (b'--frame\r\n'
+               b'Content-Type: image/jpeg\r\n\r\n' + buffer.tobytes() + b'\r\n')
+        time.sleep(1/10)
+
+@app.route('/')
+def index():
+    return '<img src="/video">'
+
+@app.route('/video')
+def video():
+    return Response(generate(), mimetype='multipart/x-mixed-replace; boundary=frame')
+
+def run_flask():
+    app.run(host='0.0.0.0', port=5000)
+
+# threading.Thread(target=run_flask, daemon=True).start()
 
 # ---------------- UDP SETUP ----------------
 ESP_IP = "10.210.6.103"
@@ -112,6 +141,7 @@ while True:
     if abs(omega) < 0.2: omega = 0
 
     send_twist(vx, omega)
+    print("vx : ",vx , " omega: ",omega)
     prev_vx = vx
     last_cmd = {"linear": vx, "angular": omega}
 
@@ -120,9 +150,12 @@ while True:
     cv2.putText(frame, f"omega: {omega:.2f}", (w - 160, 60),
                 cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
 
-    cv2.imshow("Person Follower", frame)
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
+    stream_frame = frame.copy()
+    
+
+    # cv2.imshow("Person Follower", frame)
+    # if cv2.waitKey(1) & 0xFF == ord('q'):
+    #     break
 
 cap.release()
 cv2.destroyAllWindows()
