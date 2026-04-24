@@ -57,9 +57,9 @@ while True:
             tracker = None
 
  # ---------------- PERIODIC YOLO VALIDATION ----------------
-    frame_count = (frame_count + 1) % 10   # every 10 frames
+    frame_count = (frame_count + 1) % (10 if tracking else 1) # every 10 frames
 
-    if frame_count == 1:
+    if frame_count == 0:
         results = model(frame, imgsz=320, verbose=False, classes=[0])[0]
 
         detected_boxes = []
